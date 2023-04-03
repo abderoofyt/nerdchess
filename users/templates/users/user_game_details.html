@@ -1,0 +1,450 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block content %}
+
+{% block title %} {{w.username}} - {{b.user}}{% endblock %}
+
+{% block style %}<link rel="stylesheet" href="{% static 'blog/styles.css' %}">{% endblock style %}
+
+<body>
+    <div id="fen" style="display:none;">{{game.moves}}</div>
+    <div id="container">
+        <div class="col left" id="colLeft">
+            <div id="logo">
+                <div id="toolbar" class="toolbar">
+                    <div id="buttonBack" class="off" title="Go back">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                            <path d="M15 7H3.414l4.293-4.293a1 1 0 0 0-1.414-1.414l-6 6a1 1 0 0 0 0 1.414l6 6a1 1 0 0 0 1.414-1.414L3.414 9H15a1 1 0 0 0 0-2z" />
+                        </svg>
+                    </div>
+                    <div id="buttonForward" class="off" title="Go forward">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                            <path d="M15.707 7.293l-6-6a1 1 0 0 0-1.414 1.414L12.586 7H1a1 1 0 0 0 0 2h11.586l-4.293 4.293a1 1 0 1 0 1.414 1.414l6-6a1 1 0 0 0 0-1.414z" />
+                        </svg>
+                    </div>
+                    <div id="buttonRevert" class="off" title="Revert changes">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="16" height="16">
+                            <path d="M431.85,79.13l-433.36,433.37l433.37,431.64v-273.34c463.64,-39.79 591.66,197.22 591.66,197.22c0,0 0,-431.63 -591.66,-512.94z" />
+                        </svg>
+                    </div>
+                    <div id="buttonMenu" class="on" title="Menu">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+                            <path d="M0,3c0,-0.55 0.45,-1 1,-1h14c0.55,0 1,0.45 1,1c0,0.55 -0.45,1 -1,1h-14c-0.55,0 -1,-0.45 -1,-1zM0,8c0,-0.55 0.45,-1 1,-1h14c0.55,0 1,0.45 1,1c0,0.55 -0.45,1 -1,1h-14c-0.55,0 -1,-0.45 -1,-1zM15,12c0.55,0 1,0.45 1,1c0,0.55 -0.45,1 -1,1h-14c-0.55,0 -1,-0.45 -1,-1c0,-0.55 0.45,-1 1,-1z" />
+                        </svg>
+                    </div>
+                    <div id="buttonAnalyze1" class="on" title="Analyze">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+                            <path d="M0,3c0,-0.55 0.45,-1 1,-1h14c0.55,0 1,0.45 1,1c0,0.55 -0.45,1 -1,1h-14c-0.55,0 -1,-0.45 -1,-1zM0,8c0,-0.55 0.45,-1 1,-1h14c0.55,0 1,0.45 1,1c0,0.55 -0.45,1 -1,1h-14c-0.55,0 -1,-0.45 -1,-1zM15,12c0.55,0 1,0.45 1,1c0,0.55 -0.45,1 -1,1h-14c-0.55,0 -1,-0.45 -1,-1c0,-0.55 0.45,-1 1,-1z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div id="wb"></div>
+            <div class="box" style="height:510px;min-width: 108px;min-height: 161px" id="wChessboard">
+                <div id="positionInfo" class="boxTop"></div>
+                <div id="searchWrapper" class="boxMid">
+                    <form id="simpleSearch">
+                        <input name="search" placeholder="Enter FEN, PGN or command" id="searchInput" type="search">
+                        <div id="buttonGo" title="Load FEN, PGN or command" style="display:none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                <path d="M15.707 7.293l-6-6a1 1 0 0 0-1.414 1.414L12.586 7H1a1 1 0 0 0 0 2h11.586l-4.293 4.293a1 1 0 1 0 1.414 1.414l6-6a1 1 0 0 0 0-1.414z" opacity="0.6" />
+                            </svg>
+                        </div>
+                    </form>
+                </div>
+                <div id="boxBoardOuter">
+                    <div id="boxBoard">
+                        <div id="boardWrapper">
+                            <div id="arrowWrapper1"> 
+                                <svg height="100%" width="100%">
+                                    <defs>
+                                        <marker id="markerArrow1" markerWidth="13" markerHeight="13" orient="auto" refX="3" refY="3">
+                                            <path d="M1,1 L1,5 L4,3 Z" style="fill: #000000;"></path>
+                                        </marker>
+                                    </defs>
+                                    <line style="stroke:#000000;stroke-width:6;marker-end:url(#markerArrow1);" y2="0" y1="0" x1="0" x2="0"></line>
+                                </svg>
+                            </div>
+                            <div id="arrowWrapper2">
+                                <svg height="100%" width="100%">
+                                    <defs>
+                                        <marker id="markerArrow2" markerWidth="13" markerHeight="13" orient="auto" refX="3" refY="3">
+                                            <path d="M1,1 L1,5 L4,3 Z"></path>
+                                        </marker>
+                                    </defs>
+                                    <line style="stroke-width:6;marker-end:url(#markerArrow2);" y2="0" y1="0" x1="0" x2="0"></line>
+                                </svg>
+                            </div>
+                            <div id="arrowWrapper3">
+                                <svg height="100%" width="100%">
+                                    <defs>
+                                        <marker id="markerArrow3" markerWidth="13" markerHeight="13" orient="auto" refX="3" refY="3">
+                                            <path d="M1,1 L1,5 L4,3 Z"></path>
+                                        </marker>
+                                    </defs>
+                                    <line style="stroke-width:5;marker-end:url(#markerArrow3);" y2="0" y1="0" x1="0" x2="0"></line>
+                                </svg>
+                            </div>
+                            <table id="cbTable">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div id="buttonStm" class="white" title="Change side to move">
+                                                <div></div>
+                                            </div>
+                                        </td>
+                                        <td>a</td>
+                                        <td>b</td>
+                                        <td>c</td>
+                                        <td>d</td>
+                                        <td>e</td>
+                                        <td>f</td>
+                                        <td>g</td>
+                                        <td>h</td>
+                                        <td>
+                                            <div id="buttonStm2" class="blue" title="Change side to move">
+                                                <div></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>8</td>
+                                        <td colspan="8" rowspan="8" class="cbCell">
+                                            <div id="chessboard1" class="cb"></div>
+                                        </td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>7</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>a</td>
+                                        <td>b</td>
+                                        <td>c</td>
+                                        <td>d</td>
+                                        <td>e</td>
+                                        <td>f</td>
+                                        <td>g</td>
+                                        <td>h</td>
+                                        <td>
+                                            <div id="buttonFlip" title="Flip board">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 443 443" width="16" height="16" fill="currentColor">
+                                                    <path d="M254.56,118.55v205.9l68.77,-27.17c2.31,-0.9 4.93,-0.16 6.43,1.81c0.73,0.99 1.11,2.16 1.11,3.32c0,1.17 -0.38,2.36 -1.14,3.36l-103.85,135.08c-1.05,1.35 -2.66,2.15 -4.37,2.15c-1.71,0 -3.33,-0.8 -4.38,-2.15l-103.84,-135.08c-1.53,-1.97 -1.53,-4.69 -0.04,-6.69c1.49,-1.96 4.11,-2.7 6.42,-1.8l68.77,27.16v-205.89l-68.76,27.16c-2.31,0.9 -4.93,0.16 -6.43,-1.8c-0.74,-0.99 -1.11,-2.17 -1.11,-3.32c0,-1.17 0.38,-2.36 1.14,-3.36l103.85,-135.08c1.05,-1.35 2.66,-2.15 4.37,-2.15c1.71,0 3.33,0.8 4.38,2.15l103.83,135.08c1.52,1.97 1.54,4.69 0.04,6.68c-1.48,1.97 -4.11,2.7 -6.42,1.8z" />
+                                                </svg>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="materialWrapper"></div>
+                        <div id="namesWrapperTop"></div>
+                        <div id="namesWrapperBottom"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col right" id="colRight">
+            <div class="box" style="width:405px;height: 161px;min-height:79px;" id="wStatic">
+                <div id="staticInfo" class="boxTop">Static Evaluation</div>
+                <div id="staticHeader">
+                    <div class="group">Group</div>
+                    <div class="name">Evaluation term</div>
+                    <div class="eval" id="buttonStaticSortByValue">Value</div>
+                    <div class="rel" id="buttonStaticSortByChange">Change</div>
+                </div>
+                <div id="static" class="boxMid"></div>
+            </div>
+            <div class="box" style="width:405px;min-height:79px;" id="wOpening">
+                <div class="boxTop">Opening</div>
+                <div id="openingHeader">
+                    <div class="name">ECO code / Name</div>
+                    <div class="score">Score</div>
+                    <div class="popularity">Popularity</div>
+                    <div class="moves">Moves</div>
+                </div>
+                <div id="opening" class="boxMid"></div>
+            </div>
+
+            <div class="box" style="width:405px;min-height:79px;display: none;" id="wGames">
+                <div class="boxTop">Games</div>
+                <div id="gamesHeader">
+                    <div class="name">ECO code / Player</div>
+                    <div class="score">Year</div>
+                    <div class="popularity">Winner</div>
+                    <div class="moves">Moves</div>
+                </div>
+                <div id="games" class="boxMid"></div>
+            </div>
+            <div class="box" style="width:405px;min-height:79px;display: none;" id="wPuzzles">
+                <div class="boxTop">Puzzles</div>
+                <div id="puzzlesHeader">
+                    <div class="name">Fen</div>
+                    <div class="score">No.</div>
+                    <div class="popularity">Dificulty</div>
+                </div>
+                <div id="puzzles" class="boxMid"></div>
+            </div>
+            <div class="box" style="width:405px;min-height:79px;display: none;" id="wTraps">
+                <div class="boxTop">Traping</div>
+                <div id="trapingHeader">
+                    <div class="name">ECO code / Name</div>
+                    <div class="score">Score</div>
+                    <div class="popularity">Popularity</div>
+                    <div class="moves">Moves</div>
+                </div>
+                <div id="traping" class="boxMid"></div>
+            </div>
+            <div class="box" style="width:405px;" id="wHistory">
+                <div class="boxTop">History Of Moves</div>
+                <div class="boxMid" id="history"></div>
+            </div>
+            <div class="box" style="width:405px;height: 116px;min-height:79px;" id="wMoves">
+                <div id="movesInfo" class="boxTop"></div>
+                <div id="movesHeader">
+                    <div class="san">Move</div>
+                    <div class="eval">Evaluation</div>
+                    <div class="pv" id="buttonMovesPv">PV</div>
+                    <div class="depth">Depth</div>
+                </div>
+                <div id="moves" class="boxMid"></div>
+                <div id="movesFooter" class="footer">Powered by <a href="https://github.com/niklasf/stockfish.js/">Stockfish.js</a> and <a href="https://github.com/official-stockfish/Stockfish/">Stockfish Chess Engine</a></div>
+            </div>
+            <div class="box" style="width:405px;height:155px;display:none;background-color: #697686;" id="wGraph">
+                <div class="boxTop">Evaluation Graph</div>
+                <div id="graphWrapper" class="boxGraph">
+                    <canvas id="graph">Your browser does not support the HTML5 canvas tag.</canvas>
+                </div>
+            </div>
+            <div class="box" style="width:405px;height:115px;min-height:79px;display:none;" id="wLczero">
+                <div id="lczeroInfo" class="boxTop">LcZero - Neural Network</div>
+                <div id="lczeroHeader">
+                    <div class="san">Move</div>
+                    <div class="policy">Policy</div>
+                    <div class="eval">Parent value</div>
+                </div>
+                <div id="lczero" class="boxMid"></div>
+                <div id="lczeroFooter" class="footer">Powered by <a href="https://github.com/frpays/lc0-js/">LC0-js</a>, <a href="https://github.com/LeelaChessZero/">LeelaChessZero</a> and <a href="https://www.tensorflow.org/js/">TensorFlow.js</a></div>
+            </div>
+   
+           
+            <div class="box" style="width:405px;height:122px;min-height:122px;min-width:298px;display:none;" id="wEdit">
+                <div class="boxTop">Edit tools</div>
+                <div id="editWrapperOuter" class="boxMid">
+                    <div id="editWrapper">
+                        <div class="cb">
+                            <div style="left: 0px; top: 0px;" class="l S"></div>
+                            <div style="left: 40px; top: 0px;" class="d p"></div>
+                            <div style="left: 80px; top: 0px;" class="l n"></div>
+                            <div style="left: 120px; top: 0px;" class="d b"></div>
+                            <div style="left: 160px; top: 0px;" class="l r"></div>
+                            <div style="left: 200px; top: 0px;" class="d q"></div>
+                            <div style="left: 240px; top: 0px;" class="l k"></div>
+                            <div style="left: 0px; top: 40px;" class="d -"></div>
+                            <div style="left: 40px; top: 40px;" class="l P"></div>
+                            <div style="left: 80px; top: 40px;" class="d N"></div>
+                            <div style="left: 120px; top: 40px;" class="l B"></div>
+                            <div style="left: 160px; top: 40px;" class="d R"></div>
+                            <div style="left: 200px; top: 40px;" class="l Q"></div>
+                            <div style="left: 240px; top: 40px;" class="d K"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="menu" style="display:none;"></div>
+        </div>
+    </div>
+    <div id="tooltip" style="display:none;"></div>
+    <div id="dragPiece" class="cb"></div>
+
+</body>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    var _mobile = false;
+    if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i) || window.location.href.match(/([?&]mobile=1(&|#|$))/i)) {
+        if (!window.location.href.match(/([?&]mobile=0(&|#|$))/i)) {
+            document.write('<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1"/>');
+            _mobile = true;
+        }
+    }
+</script>
+
+<script type='application/javascript' src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.14.1/dist/tf.min.js"></script>
+<script type='application/javascript' src="https://cdn.jsdelivr.net/pako/1.0.3/pako.min.js"></script>
+<script type='application/javascript' src="https://cdn.rawgit.com/dcodeIO/protobuf.js/6.8.8/dist/protobuf.min.js"></script>
+<script type='application/javascript' src="{% static 'blog/js/lc0main.js' %}"></script>
+<script type='application/javascript' src="{% static 'blog/js/scripts.js' %}"></script>
+<script type='application/javascript' src="{% static 'blog/js/opening.js' %}"></script>
+<script type='application/javascript' src="{% static 'blog/js/puzzles.js' %}"></script>
+<script type='application/javascript' src="{% static 'blog/js/traps.js' %}"></script>
+<script type='application/javascript' src="{% static 'blog/js/games.js' %}"></script>
+<script type='application/javascript' src="{% static 'blog/js/staticeval.js' %}"></script>
+<script type='application/javascript' src="{% static 'blog/js/evaluation.js' %}"></script>
+
+
+{% if flip %}
+    <script type="text/javascript">
+         doFlip();
+     </script>
+{% endif %}
+
+{{ request.user.username|json_script:"user_username" }}
+{{ room_name|json_script:"room-name" }}
+{{ request.user.profile.image.url|json_script:"user_image"}}
+<script>
+    // $(document).ready(function(event){
+    //     $("#chat-box").scrollTop($("#chat-box").scrollHeight);
+    // });
+    document.querySelector('#input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.querySelector('#submit').click();
+        }
+    });
+
+    let my_name = '{{ my_name }}';
+    const user_username = JSON.parse(document.getElementById('user_username').textContent);
+    const user_image = JSON.parse(document.getElementById('user_image').textContent);
+    document.querySelector('#submit').onclick = function (e) {
+        const messageInputDom = document.querySelector('#input');
+        const message = messageInputDom.value;
+        if(message.trim().length!=0) {
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'username': user_username,
+                'user_image': user_image,
+            }));
+            messageInputDom.value = '';
+            messageInputDom.focus();
+        }
+        else{
+            alert("Message cannot be blank");
+            messageInputDom.focus();
+        }
+    };
+
+
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+    const chatSocket = new WebSocket(
+        'ws://' +
+        window.location.host +
+        '/ws/chat/' +
+        roomName +
+        '/'
+    );
+
+    chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        console.log(data)
+        
+        if (data.username != my_name)
+            add_sender_chat(data)
+        else
+            add_receiver_chat(data)
+    }
+
+
+    function add_sender_chat(data) {
+        
+        var chat_window = document.querySelector('.chat-text-add')
+        var message = document.createElement('div')
+        message.classList.add('media', 'w-75', 'mb-3')
+        chat_window.appendChild(message)
+
+        var image = document.createElement('img')
+        image.src = String(data.user_image)
+        image.classList.add('rounded-circle')
+        image.width = 40
+        image.height = 40
+        image.alt = data.username
+        message.appendChild(image)
+
+        var text_div = document.createElement('div')
+        text_div.classList.add('media-body', 'ml-3')
+        message.appendChild(text_div)
+
+        var text_div_div = document.createElement('div')
+        text_div_div.classList.add('bg-light', 'rounded', 'py-2', 'px-3', 'mb-2')
+        text_div.appendChild(text_div_div)
+
+        var text_div_div_p = document.createElement('p')
+        text_div_div_p.classList.add('text-small', 'mb-0', 'text-muted')
+        text_div_div_p.innerHTML = data.message
+        text_div_div.appendChild(text_div_div_p)
+
+        text_div_date = document.createElement('p')
+        text_div_date.classList.add('small', 'text-muted')
+        text_div_date.innerHTML = new Date().toLocaleString()
+        text_div.appendChild(text_div_date)
+
+    }
+
+    function add_receiver_chat(data){
+        var chat_window = document.querySelector('.chat-text-add')
+
+        var message = document.createElement('div')
+        message.classList.add('media', 'w-75', 'ml-auto', 'mb-3')
+        chat_window.appendChild(message)
+
+        var text_div = document.createElement('div')
+        text_div.classList.add('media-body')
+        message.appendChild(text_div)
+
+        var text_div_div = document.createElement('div')
+        text_div_div.classList.add('bg-primary', 'rounded', 'py-2', 'px-3', 'mb-2')
+        text_div.appendChild(text_div_div)
+
+        var text_div_div_p = document.createElement('p')
+        text_div_div_p.classList.add('text-small', 'mb-0', 'text-white')
+        text_div_div_p.innerHTML = data.message
+        text_div_div.appendChild(text_div_div_p)
+
+        text_div_date = document.createElement('p')
+        text_div_date.classList.add('small', 'text-muted')
+        text_div_date.innerHTML = new Date().toLocaleString()
+        text_div.appendChild(text_div_date)
+
+        // var image = document.createElement('img')
+        // image.src = '{{my_name.profile.image.url}}'
+        // image.classList.add('rounded-circle','ml-2')
+        // image.width = 40
+        // image.height = 40
+        // message.appendChild(image)
+
+    }
+
+</script>
+
+
+{% endblock script %}
